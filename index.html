@@ -7,6 +7,14 @@
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <!--IMPORTANDO JQUERY VALIDATE-->
+        <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.js"></script>
+        <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.js"></script>
+        <style>
+            .error{
+                 color:red
+           }
+       </style>
     </head>
     <body>
         <div class="container">
@@ -34,24 +42,24 @@
                                     <div class="row form-group">
                                         <div class="col-lg-6">
                                             <label>Nome Completo</label>
-                                            <input class="form-control" type="text" name="nome">
+                                            <input class="form-control" type="text" name="nome" id="nome" required minlength="2">
                                         </div>
 
                                         <div class="col-lg-6">
                                             <label>Data de Nascimento</label>
-                                            <input class="form-control" type="text" name="data_nascimento">
+                                            <input class="form-control" type="text" name="dataNascimento" id="dataNascimento" required>
                                         </div>
                                     </div>
 
                                     <div class="row form-group">
                                         <div class="col-lg-6">
                                             <label>Email</label>
-                                            <input class="form-control" type="text" name="email">
+                                            <input class="form-control" type="text" name="email" id="email" required>
                                         </div>
 
                                         <div class="col-lg-6">
                                             <label>Telefone</label>
-                                            <input class="form-control" type="text" name="telefone">
+                                            <input class="form-control" type="text" name="telefone" id="telefone" required>
                                         </div>
                                     </div>
 
@@ -122,12 +130,81 @@
             </div>
         </div>
         <script>
+           /*
             $(function () {
                 $('.next-step').click(function (event) {
                     event.preventDefault();
                     $(this).parents('.form-step').hide().next().show();
                 });
+            }); */
+
+            /*METODO PARA CAMPO NOME CONTER APENAS LETRAS*/
+            $.validator.addMethod("alpha", function(value, element) { 
+                return this.optional(element) || /^[A-Za-z]+$/.test(value)
+            },"O campo nome só pode conter letras.");
+
+            /*METODO PARA VALIDAR TELEFONE COM NONO DIGITO*/
+            $.validator.addMethod("tel", function(value, element) {
+                return this.optional(element) || /^9[0-9]{8}$/.test(value);
+            },"Por favor insira o telefone com o 9º dígito.");
+            
+            /*METODO PARA VALIDAR DATA NO FORMATO BR*/
+            $.validator.addMethod("dataBR", function(value, element) {
+            if(value.length!=10) return false;
+            var data       = value;
+            var dia         = data.substr(0,2);
+            var barra1   = data.substr(2,1);
+            var mes        = data.substr(3,2);
+            var barra2   = data.substr(5,1);
+            var ano         = data.substr(6,4);
+            if(data.length!=10||barra1!="/"||barra2!="/"||isNaN(dia)||isNaN(mes)||isNaN(ano)||dia>31||mes>12)return false;
+            if((mes==4||mes==6||mes==9||mes==11) && dia==31)return false;
+            if(mes==2  &&  (dia>29||(dia==29 && ano%4!=0)))return false;
+            if(ano < 1900)return false;
+            return true;
+            }, "Informe uma data válida");
+
+            /*METODO PARA VALIDAR CAMPOS COM JQUERY VALIDADE*/
+            $("#step_1").validate({
+                   rules : {
+                         nome:{
+                                required:true,
+                                minlength:2,
+                                alpha:true
+                            },
+                         email:{
+                                required:true,
+                                email:true
+                            },
+                        telefone:{
+                                required:true,
+                                number:true,
+                                tel:true
+                            },
+                        dataNascimento:{
+                                required:true,
+                                dataBR:true        
+                            }
+                        },
+                   messages:{
+                         nome:{
+                                required:"Por favor, informe seu nome",
+                                minlength:"O nome deve ter pelo menos 2 caracteres"
+                         },
+                         email:{
+                                required:"Por favor, informe seu email",
+                                email: "Por favor, insira um email válido"
+                         },
+                         telefone:{
+                                required:"Por favor, informe seu telefone",
+                                number: "Por favor, insira um numero válido"       
+                         },
+                         dataNascimento:{
+                                required:"Por favor insira uma data"
+                         }
+                   }
             });
+
         </script>
     </body>
 </html>
