@@ -30,7 +30,7 @@
             <div class="row">
                 <div class="col-lg-6" id="form-container">
 
-                    <form id="step_1" class="form-step">
+                    <form id="step_1" method="post" action="index.php" class="form-step">
                         <div class="panel panel-info">
                             <div class="panel-heading">
                                 <div class="panel-title">
@@ -202,6 +202,19 @@
                          dataNascimento:{
                                 required:"Por favor insira uma data"
                          }
+                   },
+                   submitHandler: function(form){
+                        var dados=$('#step_1').serialize();
+                        console.log(dados);
+                        $.ajax({
+                            type:"POST",
+                            url: "index.php",
+                            data: dados,
+                            success: function(data){
+                                alert(data);
+                            }
+                        });
+                        return false;
                    }
             });
 
